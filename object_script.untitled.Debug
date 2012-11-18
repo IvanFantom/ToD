@@ -1,0 +1,17 @@
+INPUT(
+./debug/main.o
+./debug/mainwindow.o
+./debug/chartwidget.o
+./debug/program.o
+./debug/exception.o
+./debug/methods.o
+./debug/pointadddialog.o
+./debug/chartline.o
+./debug/aboutdialog.o
+./debug/moc_mainwindow.o
+./debug/moc_chartwidget.o
+./debug/moc_program.o
+./debug/moc_pointadddialog.o
+./debug/moc_aboutdialog.o
+./debug/qrc_resources.o
+);
