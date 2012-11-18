@@ -155,7 +155,7 @@ int Methods::K_Neighbors(Point X,int K,QVector<Point> sample,direction dir, int 
     return result=cl.value(valuei);
 }
 
-QVector<Point> Methods::findSplitLine(QVector<Point> srcpoints, int clas0, int clas1)
+QVector<Point> Methods::findSplitLine(QVector<Point> srcpoints,int dx, int clas0, int clas1)
 {
     QVector<Point> line,sample;
     int (*_metrix_)(int x1,int y1,int x2,int y2);
@@ -204,10 +204,22 @@ QVector<Point> Methods::findSplitLine(QVector<Point> srcpoints, int clas0, int c
                 line.append(P);
         }
     }
+
+    for(int i=1,k=0;i<line.size()-1;i++)
+    {
+        if(k!=dx)
+        {
+            line.remove(i--);
+            k++;
+        }
+        if(k==dx)
+            k=0;
+    }
+
     return line;
 }
 
-ChartLine Methods::findSplitLines(QVector<Point> srcpoints)
+ChartLine Methods::findSplitLines(QVector<Point> srcpoints, int dx)
 {
     ChartLine lines;
     QVector<Point> defined;
@@ -230,7 +242,7 @@ ChartLine Methods::findSplitLines(QVector<Point> srcpoints)
     for(int i=0;i<cl.size();i++)
     {
         for(int j=i+1;j<cl.size();j++)
-            lines.addLine(findSplitLine(defined,cl.value(i),cl.value(j)),cl.value(i),cl.value(j));
+            lines.addLine(findSplitLine(defined,dx,cl.value(i),cl.value(j)),cl.value(i),cl.value(j));
     }
 
     return lines;
@@ -308,3 +320,59 @@ QVector<Point> Methods::calculateClass(QVector<Point> points, CalculateMethod me
     return Xpoints;
 }
 
+void Methods::WriteFile(QVector<Point> points,QString filename)
+{
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        cerr << "Cannot open file for writting: "
+             << qPrintable(file.errorString()) << endl;
+        return;
+    }
+
+    QTextStream out(&file);
+    foreach(Point P,points)
+    {
+        out<<P.x<<" "<<P.y<<" "<<P.clas<<" ";
+        if(P.classType == DEFINED)
+            out<<"DEFINED";
+        else if(P.classType == UNDEFINED)
+            out<<"UNDEFINED";
+        if(P != points.last())
+            out<<"\r\n";
+    }
+}
+
+QVector<Point> Methods::ReadFile(QString filename)
+{
+    QVector<Point> points;
+    Point P;
+
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        cerr << "Cannot open file for reading: "
+             << qPrintable(file.errorString()) << endl;
+        return points;
+    }
+
+    QTextStream in(&file);
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList fields = line.split(' ');
+
+        P.x = fields.takeFirst().toInt();
+        P.y = fields.takeFirst().toInt();
+        P.clas = fields.takeFirst().toInt();
+
+        QString str = fields.takeFirst();
+        if(str == "DEFINED")
+            P.classType=DEFINED;
+        else if(str == "UNDEFINED")
+            P.classType=UNDEFINED;
+        points.append(P);
+    }
+
+    return points;
+}

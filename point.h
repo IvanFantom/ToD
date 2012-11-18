@@ -19,7 +19,11 @@ struct Point
     ClassType classType;
     const bool operator==(const struct Point& p1) const
     {
-         return ( p1.x == x && p1.y == y && p1.clas == clas );
+         return ( p1.x == x && p1.y == y && p1.clas == clas && p1.classType != classType);
+    }
+    const bool operator !=(const struct Point& p1) const
+    {
+        return (p1.x != x || p1.y != y || p1.clas != clas || p1.classType != classType);
     }
 };
 #endif // POINT_H
