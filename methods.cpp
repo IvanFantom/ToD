@@ -299,6 +299,16 @@ QVector<Point> Methods::calculateClass(QVector<Point> points, CalculateMethod me
             }
             break;
         }
+        case CALCULATE_METHOD_LINES:
+        {
+            StandartsCalculation(sample);
+            for(int i=0;i<Xpoints.size();i++)
+            {
+                Xpoints[i].clas=Standarts(Xpoints.value(i),dir,_metrix_);
+                //! don't do it Xpoints[i].classType=DEFINED;
+            }
+            break;
+        }
         case CALCULATE_METHOD_K_NEIGBORDS:
         {
             int K;
@@ -318,61 +328,4 @@ QVector<Point> Methods::calculateClass(QVector<Point> points, CalculateMethod me
         Xpoints.append(p);
 
     return Xpoints;
-}
-
-void Methods::WriteFile(QVector<Point> points,QString filename)
-{
-    QFile file(filename);
-    if(!file.open(QIODevice::WriteOnly))
-    {
-        cerr << "Cannot open file for writting: "
-             << qPrintable(file.errorString()) << endl;
-        return;
-    }
-
-    QTextStream out(&file);
-    foreach(Point P,points)
-    {
-        out<<P.x<<" "<<P.y<<" "<<P.clas<<" ";
-        if(P.classType == DEFINED)
-            out<<"DEFINED";
-        else if(P.classType == UNDEFINED)
-            out<<"UNDEFINED";
-        if(P != points.last())
-            out<<"\r\n";
-    }
-}
-
-QVector<Point> Methods::ReadFile(QString filename)
-{
-    QVector<Point> points;
-    Point P;
-
-    QFile file(filename);
-    if(!file.open(QIODevice::ReadOnly))
-    {
-        cerr << "Cannot open file for reading: "
-             << qPrintable(file.errorString()) << endl;
-        return points;
-    }
-
-    QTextStream in(&file);
-    while(!in.atEnd())
-    {
-        QString line = in.readLine();
-        QStringList fields = line.split(' ');
-
-        P.x = fields.takeFirst().toInt();
-        P.y = fields.takeFirst().toInt();
-        P.clas = fields.takeFirst().toInt();
-
-        QString str = fields.takeFirst();
-        if(str == "DEFINED")
-            P.classType=DEFINED;
-        else if(str == "UNDEFINED")
-            P.classType=UNDEFINED;
-        points.append(P);
-    }
-
-    return points;
 }

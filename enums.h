@@ -8,7 +8,7 @@
 #define ENUMS_H
 
 //this enum define method for calculating point class
-enum CalculateMethod { CALCULATE_METHOD_K_NEIGBORDS, CALCULATE_METHOD_STANTARD };
+enum CalculateMethod { CALCULATE_METHOD_K_NEIGBORDS, CALCULATE_METHOD_STANTARD, CALCULATE_METHOD_LINES };
 //this enum define calculating metrix  for calculating point class
 enum CalculateMetrix { CALCULATE_METRIX_EUCLIDEAN, CALCULATE_METRIX_DIRCOS, CALCULATE_METRIX_TINIMOTO};
 

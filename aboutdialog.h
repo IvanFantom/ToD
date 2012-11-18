@@ -1,3 +1,9 @@
+/*!
+ * @author Denis Vashchuk
+ * Class for work with split lines in chart
+ *
+*/
+
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 

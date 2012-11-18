@@ -34,11 +34,17 @@ public:
 private:
     ChartWidget* chartWidget;
     Ui::MainWindow *ui;
+private slots:
+    void openFileSlot();
+    void saveFileSlot();
 signals:
     void calculateButtonClicked();
     void drawButtonClicked();
     void aboutActionClicked();
     void cleanButtonClicked();
+    void openFileSignal(QString);
+    void saveFileSignal(QString);
+    void paramChangedSignal();
 };
 
 #endif // MAINWINDOW_H

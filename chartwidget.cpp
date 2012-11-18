@@ -123,6 +123,7 @@ void ChartWidget::setPoints(QVector<Point> &srcPoints)
 
     foreach(Point p, srcPoints)
         addPoint(p);
+
     repaint();
 }
 
@@ -188,15 +189,15 @@ void ChartWidget::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::LeftButton) {
         //if not found
         if( index == -1 ) {
-
-            if(selectedPointIndex != -1 )
-                moveToNewPos(selectedPointIndex, event->x(), event->y());
+            //точка не выделена
+            selectedPointIndex = -1;
             return;
         }
 
         //select point
         selectPoint(index);
-
+        //this->setCursor(Qt::ClosedHandCursor);
+        this->setCursor(Qt::DragMoveCursor);
         qDebug() << "Point founded at " << event->x() << " " << event->y();
     }
     else if(event->button() == Qt::RightButton) {
@@ -230,6 +231,22 @@ void ChartWidget::mousePressEvent(QMouseEvent *event)
             emit pointAdded(points.count()-1);
         }
 
+    }
+}
+
+void ChartWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    this->setCursor(Qt::ArrowCursor);
+
+    if(event->button() == Qt::LeftButton) {
+        //if not found
+        if( selectedPointIndex != -1 ) {
+
+            if(selectedPointIndex != -1 )
+                moveToNewPos(selectedPointIndex, event->x(), event->y());
+            return;
+        }
+        qDebug() << "Point founded at " << event->x() << " " << event->y();
     }
 }
 
@@ -413,9 +430,9 @@ void ChartWidget::moveToNewPos(int index, int x, int y)
 {
     points[index].point.x = convertCoordFromWidget(x, X);
     points[index].point.y = convertCoordFromWidget(y, Y);
-
     resetPoints();
     repaint();
+    emit pointMoved(index, x, y);
 }
 
 int ChartWidget::convertCoordFromChart(int coord, AXIS a) const
@@ -443,8 +460,16 @@ ChartLine &ChartWidget::chartLines()
     return lines;
 }
 
-void ChartWidget::RemoveAllPoints()
+void ChartWidget::removeAllPoints()
 {
     points.clear();
+}
+
+void ChartWidget::cleanAll()
+{
+    points.clear();
+    standarts.clear();
+    lines.removeAll();
+    repaint();
 }
 

@@ -71,7 +71,9 @@ public:
     //!get chart lines
     ChartLine& chartLines();
     //!remove all points from chart
-    void RemoveAllPoints();
+    void removeAllPoints();
+    //!clean all
+    void cleanAll();
 
 protected:
     int edgeOffset;
@@ -98,6 +100,7 @@ protected:
 
     virtual void paintEvent ( QPaintEvent * event );
     virtual void mousePressEvent ( QMouseEvent * event );
+    virtual void mouseReleaseEvent( QMouseEvent *event );
     virtual void contextMenuEvent(QContextMenuEvent *);
 
 

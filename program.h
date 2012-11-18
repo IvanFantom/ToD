@@ -26,6 +26,9 @@ public slots:
     void processCalculating();
     void processLineDraw();
     void showAboutDialog();
+    void openFileSlot(QString);
+    void saveFileSlot(QString);
+    void cleanSlot();
 };
 
 #endif // PROGRAM_H

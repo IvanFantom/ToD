@@ -39,9 +39,6 @@ public:
 
     QVector<Point> findSplitLine(QVector<Point> srcpoints,int dx,int clas0, int clas1);
     ChartLine findSplitLines(QVector<Point> srcpoints,int dx);
-
-    void WriteFile(QVector<Point> points,QString filename);
-    QVector<Point> ReadFile(QString filename);
 };
 
 #endif // METHODS_H

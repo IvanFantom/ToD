@@ -5,7 +5,7 @@
 #include "chartwidget.h"
 #include "methods.h"
 #include "aboutdialog.h"
-
+#include "fileoperations.h"
 
 /*
  *Сделать умною линию
@@ -14,15 +14,30 @@
  *Подгрузку из файла выборки
  *Очистка линии
  *Очистка точек
- *� уссифицировать
+ *Руссифицировать
 */
 
 Program::Program(): fullScreen(false)
 {
-    if( QApplication::arguments().contains("--fullscreen") )
-        fullScreen = true;
-
     init();
+
+    (window->getChartWidget())->setMaxX(200);
+    (window->getChartWidget())->setMaxY(200);
+
+    foreach( QString arg, QApplication::arguments()) {
+        if( arg.indexOf("--file=")!=-1 ) {
+            int index = arg.indexOf("=")+1;
+            QString uri = arg.mid(index, arg.length()-index);
+            qDebug() << "Loading file: " << uri;
+            QVector<Point> points =  FileOperations::ReadFile(uri);
+            window->getChartWidget()->setPoints(points);
+
+        }
+        else if( arg.startsWith("--fullscreen")) {
+            fullScreen = true;
+        }
+    }
+
 }
 
 void Program::init()
@@ -31,26 +46,17 @@ void Program::init()
     connect( window, SIGNAL(calculateButtonClicked()), this, SLOT(processCalculating()) );
     connect( window, SIGNAL(drawButtonClicked()), this, SLOT(processLineDraw()) );
     connect( window, SIGNAL(aboutActionClicked()), this, SLOT(showAboutDialog()));
+    connect( window, SIGNAL(openFileSignal(QString)), this, SLOT(openFileSlot(QString)));
+    connect( window, SIGNAL(saveFileSignal(QString)), this, SLOT(saveFileSlot(QString)));
+    connect( window->getChartWidget(), SIGNAL(pointAdded(int)), this, SLOT(processCalculating()) );
+    connect( window->getChartWidget(), SIGNAL(pointMoved(int,int,int)), this, SLOT(processCalculating()) );
+    connect( window, SIGNAL(paramChangedSignal()), this, SLOT(processCalculating()) );
+    connect( window, SIGNAL(cleanButtonClicked()), this, SLOT(cleanSlot()));
 }
 
 
 void Program::showGUI()
 {
-    int classCount = 2;
-
-    (window->getChartWidget())->setMaxX(200);
-    (window->getChartWidget())->setMaxY(200);
-
-    for(int i=0; i<10; i++)
-    {
-        Point point;
-        point.x = qrand()%200;
-        point.y = qrand()%200;
-        point.clas = qrand()%classCount;
-
-        (window->getChartWidget())->addPoint(point);
-    }
-
     if( fullScreen )
         window->showFullScreen();
     else
@@ -62,17 +68,26 @@ void Program::processCalculating()
     window->setCursor(Qt::WaitCursor);
     qDebug() << "Finding undefined class point class.";
     Methods alg;
+    CalculateMethod method = window->getCalculateMethod();
+
+
 
     QVector<Point> points = alg.calculateClass(window->getChartWidget()->getPoints(),
-                                              window->getCalculateMethod(),
+                                              method,
                                               window->getCalculateMetrix() );
     //seting up points
     window->getChartWidget()->setPoints(points);
 
-    if( window->getCalculateMethod() == CALCULATE_METHOD_STANTARD )
+    if( method ==  CALCULATE_METHOD_STANTARD )
         window->getChartWidget()->setStandard( alg.GetStandarts() );
     else
         window->getChartWidget()->setStandard( QVector<Point>() );
+
+    if( method == CALCULATE_METHOD_LINES )
+        processLineDraw();
+    else
+        window->getChartWidget()->chartLines().removeAll();
+
 
     window->setCursor(Qt::ArrowCursor);
 }
@@ -90,5 +105,23 @@ void Program::showAboutDialog()
 {
     AboutDialog dialog;
     dialog.exec();
+}
+
+void Program::openFileSlot(QString uri)
+{
+   QVector<Point> points = FileOperations::ReadFile(uri);
+    window->getChartWidget()->setPoints(points);
+    qDebug() << "Loading file: " << uri;
+}
+
+void Program::saveFileSlot(QString uri)
+{
+    FileOperations::WriteFile(window->getChartWidget()->getPoints(), uri);
+    qDebug() << "Saving file: " << uri;
+}
+
+void Program::cleanSlot()
+{
+    window->getChartWidget()->cleanAll();
 }
 
