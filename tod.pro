@@ -17,7 +17,7 @@ SOURCES += 	main.cpp\
                 pointadddialog.cpp \
                 chartline.cpp \
                 aboutdialog.cpp \
-    fileoperations.cpp
+                fileoperations.cpp
 
 HEADERS  += mainwindow.h \
 	   chartwidget.h \
@@ -30,7 +30,7 @@ HEADERS  += mainwindow.h \
            enums.h \
            chartline.h \
            aboutdialog.h \
-    fileoperations.h
+            fileoperations.h
 		
 FORMS    += mainwindow.ui \
     pointadddialog.ui \

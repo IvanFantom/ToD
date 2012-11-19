@@ -14,7 +14,7 @@
  *Подгрузку из файла выборки
  *Очистка линии
  *Очистка точек
- *Руссифицировать
+ *� уссифицировать
 */
 
 Program::Program(): fullScreen(false)
@@ -96,7 +96,7 @@ void Program::processLineDraw()
 {
     qDebug() << "Finding all spit lines...";
     Methods alg;
-    ChartLine lines = alg.findSplitLines(window->getChartWidget()->getPoints(), 20);
+    ChartLine lines = alg.findSplitLines(window->getChartWidget()->getPoints(), 1);
     window->getChartWidget()->chartLines() = lines;
     window->getChartWidget()->repaint();
 }

@@ -197,7 +197,7 @@ void ChartWidget::mousePressEvent(QMouseEvent *event)
         //select point
         selectPoint(index);
         //this->setCursor(Qt::ClosedHandCursor);
-        this->setCursor(Qt::DragMoveCursor);
+        this->setCursor(Qt::ClosedHandCursor);
         qDebug() << "Point founded at " << event->x() << " " << event->y();
     }
     else if(event->button() == Qt::RightButton) {

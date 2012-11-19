@@ -155,12 +155,14 @@ int Methods::K_Neighbors(Point X,int K,QVector<Point> sample,direction dir, int 
     return result=cl.value(valuei);
 }
 
-QVector<Point> Methods::findSplitLine(QVector<Point> srcpoints,int dx, int clas0, int clas1)
+QVector<Point> Methods::findSplitLine(QVector<Point> srcpoints,int dy, int clas0, int clas1)
 {
-    QVector<Point> line,sample;
+    QVector<Point> line,smartline,sample;
     int (*_metrix_)(int x1,int y1,int x2,int y2);
     Point P;
     int minX,minY,maxX,maxY;
+    int sumUpX,sumDownX;
+    sumUpX=sumDownX=0;
 
     _metrix_ = Methods::EuclideanDistance;
 
@@ -188,10 +190,17 @@ QVector<Point> Methods::findSplitLine(QVector<Point> srcpoints,int dx, int clas0
         else if(maxY<sample.value(i).y)
             maxY=sample.value(i).y;
     }
-
     StandartsCalculation(sample); //вычисление эталонов
 
-    for(int y=minY-1;y<maxY+1;y+=1)
+    P.y=minY;
+    for(int x=minX-1;x<maxX+1;x++)
+    {
+        P.x=x;
+        if(Standarts(P,MIN,_metrix_)==-2)
+            line.append(P);
+    }
+
+    for(int y=minY-1;y<maxY+1;y+=dy)
     {
         P.y=y;
         P.clas = -1;
@@ -200,26 +209,47 @@ QVector<Point> Methods::findSplitLine(QVector<Point> srcpoints,int dx, int clas0
         for(int x=minX-1;x<maxX+1;x+=1)
         {
             P.x=x;
-            if(Standarts(P,MIN,_metrix_)==-2)//if(m.K_Neighbors(P,5,sample,dir,metric)==-2)
+            if(Standarts(P,MIN,_metrix_)==-2)
                 line.append(P);
         }
     }
 
-    for(int i=1,k=0;i<line.size()-1;i++)
+    P.y=maxY;
+    for(int x=minX-1;x<maxX+1;x++)
     {
-        if(k!=dx)
+        P.x=x;
+        if(Standarts(P,MIN,_metrix_)==-2)
+            line.append(P);
+    }
+
+    for(int i=0;i<line.size()/2;i++)
+        sumDownX+=line.value(i).x;
+    for(int i=line.size()/2;i<line.size();i++)
+        sumUpX+=line.value(i).x;
+
+    P.x=sumDownX/(line.size()/2);
+    P.y=minY;
+    smartline.append(P);
+
+    P.x=sumUpX/( (line.size()) - (line.size()/2) );
+    P.y=maxY;
+    smartline.append(P);
+
+    /*for(int i=1,k=0;i<line.size()-1;i++)
+    {
+        if(k!=dy)
         {
             line.remove(i--);
             k++;
         }
-        if(k==dx)
+        if(k==dy)
             k=0;
-    }
+    }*/
 
-    return line;
+    return smartline;
 }
 
-ChartLine Methods::findSplitLines(QVector<Point> srcpoints, int dx)
+ChartLine Methods::findSplitLines(QVector<Point> srcpoints, int dy)
 {
     ChartLine lines;
     QVector<Point> defined;
@@ -242,7 +272,7 @@ ChartLine Methods::findSplitLines(QVector<Point> srcpoints, int dx)
     for(int i=0;i<cl.size();i++)
     {
         for(int j=i+1;j<cl.size();j++)
-            lines.addLine(findSplitLine(defined,dx,cl.value(i),cl.value(j)),cl.value(i),cl.value(j));
+            lines.addLine(findSplitLine(defined,dy,cl.value(i),cl.value(j)),cl.value(i),cl.value(j));
     }
 
     return lines;
@@ -311,7 +341,7 @@ QVector<Point> Methods::calculateClass(QVector<Point> points, CalculateMethod me
         }
         case CALCULATE_METHOD_K_NEIGBORDS:
         {
-            int K;
+            int K = sample.size()/2;
             for(int i=0;(sample.size()+i)%2==0;i++)
                 K = (sample.size()+i)/2;
 
