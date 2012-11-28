@@ -37,8 +37,8 @@ public:
 
     QVector<Point> calculateClass(QVector<Point> points,CalculateMethod method,CalculateMetrix metrix);
 
-    QVector<Point> findSplitLine(QVector<Point> srcpoints,int dy,int clas0, int clas1);
-    ChartLine findSplitLines(QVector<Point> srcpoints,int dy);
+    QVector<Point> findSplitLine(QVector<Point> srcpoints,int dy,int clas0, int clas1,int xMAX,int yMAX);
+    ChartLine findSplitLines(QVector<Point> srcpoints,int dy, int xMAX, int yMAX);
 };
 
 #endif // METHODS_H
